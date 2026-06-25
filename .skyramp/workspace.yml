@@ -6,7 +6,7 @@ metadata:
   schemaVersion: v1
   executorVersion: v1.3.29
   createdAt: "2026-06-25T19:06:51.168Z"
-  updatedAt: "2026-06-25T19:08:42.838Z"
+  updatedAt: "2026-06-25T20:36:55.168Z"
 services:
   - serviceName: wger-backend
     language: python
@@ -32,7 +32,6 @@ services:
       authHeader: ""
       baseUrl: http://localhost:3000
     runtimeDetails:
-      serverStartCommand: npm run start
       runtime: local
   - serviceName: wger-flutter-frontend
     repository: mrugeshmaster/wger-flutter

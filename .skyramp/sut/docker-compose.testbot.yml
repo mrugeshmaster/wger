@@ -4,7 +4,7 @@ services:
   db:
     image: postgres:15-alpine
     env_file:
-      - ../../wger-docker/config/prod.env
+      - ./testbot.env
     volumes:
       - postgres-data:/var/lib/postgresql/data/
     expose:
@@ -30,7 +30,7 @@ services:
   web:
     image: wger/server:pr-build
     env_file:
-      - ../../wger-docker/config/prod.env
+      - ./testbot.env
     volumes:
       - static:/home/wger/static
       - media:/home/wger/media

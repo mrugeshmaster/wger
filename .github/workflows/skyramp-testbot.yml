@@ -7,10 +7,6 @@ on:
     types: [created]
   workflow_dispatch:
     inputs:
-      wger-docker_ref:
-        description: 'Git ref (branch, tag, or SHA) of mrugeshmaster/wger-docker to analyze. Defaults to its default branch.'
-        required: false
-        type: string
       wger-react_ref:
         description: 'Git ref (branch, tag, or SHA) of mrugeshmaster/wger-react to analyze. Defaults to its default branch.'
         required: false
@@ -44,33 +40,13 @@ jobs:
         with:
           app-id: ${{ secrets.SKYRAMP_TESTBOT_APP_ID }}
           private-key: ${{ secrets.SKYRAMP_TESTBOT_APP_PRIVATE_KEY }}
-          repositories: wger,wger-docker,wger-react,wger-flutter
+          repositories: wger,wger-react,wger-flutter
 
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           fetch-depth: 0
           filter: blob:none
           path: wger
-          token: ${{ steps.skyramp-testbot-app-token.outputs.token }}
-
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
-        id: skyramp-checkout-wger-docker
-        continue-on-error: true
-        with:
-          repository: mrugeshmaster/wger-docker
-          path: wger-docker
-          fetch-depth: 0
-          filter: blob:none
-          ref: ${{ inputs['wger-docker_ref'] || github.head_ref || github.ref_name }}
-          token: ${{ steps.skyramp-testbot-app-token.outputs.token }}
-
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
-        if: steps['skyramp-checkout-wger-docker'].outcome == 'failure'
-        with:
-          repository: mrugeshmaster/wger-docker
-          path: wger-docker
-          fetch-depth: 0
-          filter: blob:none
           token: ${{ steps.skyramp-testbot-app-token.outputs.token }}
 
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
@@ -124,6 +100,5 @@ jobs:
           targetTeardownCommand: 'docker compose -f ./.skyramp/sut/docker-compose.testbot.yml down -v'
           skyrampMcpVersion: '0.2.150-rc.ui.mntnc'
           relatedRepoPaths: |
-            ./wger-docker
             ./wger-react
             ./wger-flutter

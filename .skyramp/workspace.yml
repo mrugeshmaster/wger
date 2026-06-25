@@ -14,9 +14,9 @@ services:
     testDirectory: tests/skyramp
     api:
       schemaPath: http://localhost/api/v2/schema
-      authType: bearer
+      authType: token
       authHeader: Authorization
-      authScheme: Bearer
+      authScheme: Token
       baseUrl: http://localhost
     runtimeDetails:
       serverStartCommand: docker compose -f .skyramp/sut/docker-compose.testbot.yml up -d web

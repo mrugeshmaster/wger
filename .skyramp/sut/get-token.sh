@@ -9,5 +9,5 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 user = User.objects.get(username='admin')
 token, _ = Token.objects.get_or_create(user=user)
-print(token.key)
-"
+import sys; sys.stdout.write(token.key)
+" | tr -d '\r\n'

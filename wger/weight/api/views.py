@@ -24,6 +24,7 @@ from django.db.models import (
 )
 
 # Third Party
+from django.db.models import Avg, Count, Max, Min
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response

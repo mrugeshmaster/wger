@@ -16,7 +16,10 @@
 # along with Workout Manager.  If not, see <http://www.gnu.org/licenses/>.
 
 # Third Party
+from django.db.models import Avg, Count, Max, Min
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 # wger
 from wger.weight.api.filtersets import WeightEntryFilterSet
@@ -26,7 +29,7 @@ from wger.weight.models import WeightEntry
 
 class WeightEntryViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for nutrition plan objects
+    API endpoint for weight entry objects
     """
 
     serializer_class = WeightEntrySerializer
@@ -50,3 +53,18 @@ class WeightEntryViewSet(viewsets.ModelViewSet):
         Set the owner
         """
         serializer.save(user=self.request.user)
+
+    @action(detail=False, methods=['get'])
+    def summary(self, request):
+        """
+        Returns aggregate statistics for the authenticated user's weight entries:
+        count, min_weight, max_weight, avg_weight.
+        """
+        qs = self.get_queryset()
+        stats = qs.aggregate(
+            count=Count('id'),
+            min_weight=Min('weight'),
+            max_weight=Max('weight'),
+            avg_weight=Avg('weight'),
+        )
+        return Response(stats)

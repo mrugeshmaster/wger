@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-U="${WGER_ADMIN:-admin}"
-P="${WGER_PASS:-adminadmin}"
-
-curl -sf -X POST "http://localhost/api/v2/login/" \
-  -H 'Content-Type: application/json' \
-  -d "{\"username\":\"$U\",\"password\":\"$P\"}" \
-  | python3 -c "import json,sys; print(json.load(sys.stdin)['token'])"
+# wger 2.7+ removed the /api/v2/login/ HTTP endpoint. Obtain the DRF token
+# directly via Django shell — no HTTP roundtrip needed.
+docker compose -f ./.skyramp/sut/docker-compose.testbot.yml exec -T web \
+  python3 manage.py shell -c "
+from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
+user = User.objects.get(username='admin')
+token, _ = Token.objects.get_or_create(user=user)
+print(token.key)
+"

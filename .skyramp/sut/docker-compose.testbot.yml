@@ -1,0 +1,58 @@
+name: wger-testbot
+
+services:
+  db:
+    image: postgres:15-alpine
+    env_file:
+      - ../../wger-docker/config/prod.env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/
+    expose:
+      - 5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  cache:
+    image: redis:alpine
+    expose:
+      - 6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  web:
+    image: wger/server:pr-build
+    env_file:
+      - ../../wger-docker/config/prod.env
+    volumes:
+      - static:/home/wger/static
+      - media:/home/wger/media
+    ports:
+      - "80:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8000/api/v2/"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 300s
+
+volumes:
+  postgres-data:
+  static:
+  media:
+
+networks:
+  default:
+    name: wger_testbot_network

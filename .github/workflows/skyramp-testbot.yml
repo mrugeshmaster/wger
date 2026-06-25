@@ -119,9 +119,9 @@ jobs:
           anthropicApiKey: ${{ secrets.SKYRAMP_TESTBOT_API_KEY }}
           githubToken: ${{ steps.skyramp-testbot-app-token.outputs.token }}
           workingDirectory: 'wger'
-          targetSetupCommand: 'docker build -t wger/server:pr-build -f ./extras/docker/production/Dockerfile . && docker compose -f ../wger-docker/docker-compose.yml -f ./.skyramp/sut/docker-compose.pr.yml --project-directory ../wger-docker up -d'
+          targetSetupCommand: 'docker build -t wger/server:pr-build -f ./extras/docker/production/Dockerfile . && docker compose -f ./.skyramp/sut/docker-compose.testbot.yml up -d'
           targetReadyCheckCommand: 'curl -sf http://localhost/api/v2/'
-          targetTeardownCommand: 'docker compose -f ../wger-docker/docker-compose.yml -f ./.skyramp/sut/docker-compose.pr.yml --project-directory ../wger-docker down -v'
+          targetTeardownCommand: 'docker compose -f ./.skyramp/sut/docker-compose.testbot.yml down -v'
           skyrampMcpVersion: '0.2.150-rc.ui.mntnc'
           relatedRepoPaths: |
             ./wger-docker

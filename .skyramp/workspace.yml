@@ -30,10 +30,11 @@ services:
     api:
       authType: none
       authHeader: ""
-      baseUrl: http://localhost:3000
+      baseUrl: http://localhost
     runtimeDetails:
-      serverStartCommand: npm run start
-      runtime: local
+      serverStartCommand: docker compose -f .skyramp/sut/docker-compose.testbot.yml up -d web
+      runtime: docker
+      dockerNetwork: wger_testbot_network
   - serviceName: wger-flutter-frontend
     repository: mrugeshmaster/wger-flutter
     language: javascript

@@ -6,7 +6,7 @@ metadata:
   schemaVersion: v1
   executorVersion: v1.3.29
   createdAt: "2026-06-25T19:06:51.168Z"
-  updatedAt: "2026-06-25T19:08:42.838Z"
+  updatedAt: "2026-06-25T20:37:52.999Z"
 services:
   - serviceName: wger-backend
     language: python

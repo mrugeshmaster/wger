@@ -96,8 +96,10 @@ jobs:
           githubToken: ${{ steps.skyramp-testbot-app-token.outputs.token }}
           workingDirectory: 'wger'
           targetSetupCommand: 'docker build -t wger/server:pr-build -f ./extras/docker/production/Dockerfile . && docker compose -f ./.skyramp/sut/docker-compose.testbot.yml up -d'
-          targetReadyCheckCommand: 'curl -sf http://localhost/api/v2/'
+          targetReadyCheckCommand: 'curl -sf http://localhost/api/v2/version/'
+          targetReadyCheckTimeout: '900'
           targetTeardownCommand: 'docker compose -f ./.skyramp/sut/docker-compose.testbot.yml down -v'
+          authTokenCommand: 'bash ./.skyramp/sut/get-token.sh'
           skyrampMcpVersion: '0.2.150-rc.ui.mntnc'
           relatedRepoPaths: |
             ./wger-react

@@ -15,8 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Workout Manager.  If not, see <http://www.gnu.org/licenses/>.
 
+# Django
+from django.db.models import (
+    Avg,
+    Count,
+    Max,
+    Min,
+)
+
 # Third Party
-from django.db.models import Avg, Count, Max, Min
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response

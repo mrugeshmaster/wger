@@ -19,7 +19,7 @@ from django_filters import rest_framework as filters
 # wger
 from wger.weight.models import WeightEntry
 
-
+# test
 class WeightEntryFilterSet(filters.FilterSet):
     year = filters.NumberFilter(field_name='date', lookup_expr='year')
 

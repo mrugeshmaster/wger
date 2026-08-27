@@ -5,7 +5,7 @@ set -euo pipefail
 # directly via python3 -c + django.setup(), bypassing manage.py entirely so
 # no startup messages (system checks, deprecation warnings) appear on stdout.
 # sys.stdout.write() emits no trailing newline; host-side 2>/dev/null drops
-# any container stderr. The result is the bare 40-char hex token key.
+# any container stderr. The result is the bare 40-char hex token key. test
 docker compose -f ./.skyramp/sut/docker-compose.testbot.yml exec -T web \
   python3 -c "
 import sys, os

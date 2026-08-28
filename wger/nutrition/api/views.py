@@ -275,6 +275,8 @@ class NutritionPlanViewSet(viewsets.ModelViewSet):
         'creation_date',
         'description',
         'has_goal_calories',
+        'only_logging',
+        'start',
     )
 
     def get_queryset(self):

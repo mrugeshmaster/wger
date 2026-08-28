@@ -1,0 +1,48 @@
+# Skyramp Workspace Configuration
+workspace:
+  repoName: mrugeshmaster/wger
+  repoUrl: https://github.com/mrugeshmaster/wger
+metadata:
+  schemaVersion: v1
+  executorVersion: v1.3.40
+  createdAt: "2026-08-28T19:51:51.808Z"
+  updatedAt: "2026-08-28T19:55:25.734Z"
+services:
+  - serviceName: wger-backend
+    language: python
+    framework: pytest
+    testDirectory: tests/skyramp
+    api:
+      schemaPath: http://localhost:8000/api/v2/schema
+      authType: token
+      authHeader: Authorization
+      baseUrl: http://localhost:8000/api/v2
+    runtimeDetails:
+      serverStartCommand: docker compose -f .skyramp/sut/docker-compose.testbot.yml --project-directory . up -d
+      serverStopCommand: docker compose -f .skyramp/sut/docker-compose.testbot.yml --project-directory . down -v
+      runtime: docker
+      dockerNetwork: wger_default
+      testSuites:
+        - framework: pytest
+          testRunCommand: uv run ./manage.py test
+          testEnv:
+            DJANGO_SETTINGS_MODULE: settings.ci
+            DJANGO_MEDIA_ROOT: /tmp/wger-test
+          pathGlobs:
+            - wger/**/tests/test_*.py
+          canaryStatus: unproven
+          canaryDetail: >-
+            Django's test runner rejects --json-report (unrecognized argument). Add pytest-django to switch to pytest
+            and unlock file-path selectors.
+  - serviceName: wger-react-frontend
+    repository: mrugeshmaster/wger-react
+    language: typescript
+    framework: vitest
+    testDirectory: tests/skyramp
+    api:
+      authType: none
+      authHeader: ""
+      baseUrl: http://localhost:3000
+    runtimeDetails:
+      serverStartCommand: npm run start
+      runtime: local

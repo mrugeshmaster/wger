@@ -32,6 +32,7 @@ from wger.core.tests.base_testcase import (
     WgerEditTestCase,
     WgerTestCase,
 )
+from wger.nutrition.models import NutritionPlan
 
 
 class StatusUserTestCase(WgerTestCase):
@@ -67,7 +68,7 @@ class StatusUserTestCase(WgerTestCase):
         user.save()
         self.assertFalse(user.is_active)
 
-        response = self.client.get(reverse('core:user:activate', kwargs={'pk': user.pk}))
+        response = self.client.post(reverse('core:user:activate', kwargs={'pk': user.pk}))
         user = User.objects.get(pk=2)
 
         self.assertIn(response.status_code, (302, 403))
@@ -109,7 +110,7 @@ class StatusUserTestCase(WgerTestCase):
         user.save()
         self.assertTrue(user.is_active)
 
-        response = self.client.get(reverse('core:user:deactivate', kwargs={'pk': user.pk}))
+        response = self.client.post(reverse('core:user:deactivate', kwargs={'pk': user.pk}))
         user = User.objects.get(pk=2)
 
         self.assertIn(response.status_code, (302, 403))
@@ -141,6 +142,38 @@ class StatusUserTestCase(WgerTestCase):
         Tests deactivating a user a logged out user
         """
         self.deactivate(fail=True)
+
+    def test_activate_get_does_not_mutate(self):
+        """
+        Regression test: GET must only render a confirmation form, since
+        Django's CSRF protection does not apply to GET requests. The state
+        change must require POST.
+        """
+        user = User.objects.get(pk=2)
+        user.is_active = False
+        user.save()
+
+        self.user_login(self.user_success[0])
+        response = self.client.get(reverse('core:user:activate', kwargs={'pk': user.pk}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(User.objects.get(pk=2).is_active)
+
+    def test_deactivate_get_does_not_mutate(self):
+        """
+        Regression test: GET must only render a confirmation form, since
+        Django's CSRF protection does not apply to GET requests. The state
+        change must require POST.
+        """
+        user = User.objects.get(pk=2)
+        user.is_active = True
+        user.save()
+
+        self.user_login(self.user_success[0])
+        response = self.client.get(reverse('core:user:deactivate', kwargs={'pk': user.pk}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(User.objects.get(pk=2).is_active)
 
 
 class TrainerCannotDeactivatePrivilegedUsersTestCase(WgerTestCase):
@@ -197,7 +230,7 @@ class TrainerCannotDeactivatePrivilegedUsersTestCase(WgerTestCase):
         member of their own gym) must keep working.
         """
         self.user_login(self.TRAINER)
-        response = self.client.get(
+        response = self.client.post(
             reverse('core:user:deactivate', kwargs={'pk': self.REGULAR_MEMBER_PK})
         )
         self.assertEqual(response.status_code, 302)
@@ -327,6 +360,27 @@ class UserDetailPageTestCase2(WgerAccessTestCase):
         'member1',
         'member2',
     )
+
+
+class UserDetailPageMacroUnitTestCase(WgerTestCase):
+    """
+    Tests that nutrition plan macros on the user detail page are labeled in grams
+    """
+
+    def test_macros_labeled_in_grams_for_imperial_user(self):
+        """
+        Tests that the macro labels stay 'g' for users with imperial units
+        """
+        member = User.objects.get(pk=2)
+        member.userprofile.weight_unit = 'lb'
+        member.userprofile.save()
+        NutritionPlan.objects.create(user=member)
+
+        self.user_login('trainer1')
+        response = self.client.get(reverse('core:user:overview', kwargs={'pk': member.pk}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'oz')
 
 
 class UserTrustworthinessTestCase(WgerTestCase):

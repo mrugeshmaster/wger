@@ -19,6 +19,7 @@ from unittest import mock
 # Django
 from django.conf import settings
 from django.urls import reverse
+from django.utils import timezone
 
 # wger
 from wger.core.tests.api_base_test import ApiBaseResourceTestCase
@@ -169,7 +170,7 @@ class RoutineTestCase(WgerTestCase):
         """
 
         # Arrange
-        today = datetime.date.today()
+        today = timezone.localdate()
         start = today - datetime.timedelta(days=5)
         self.routine.start = start
         self.routine.end = today + datetime.timedelta(weeks=3)
@@ -288,7 +289,7 @@ class RoutineTestCase(WgerTestCase):
         """
 
         # Arrange
-        today = datetime.date.today()
+        today = timezone.localdate()
         start = today - datetime.timedelta(days=5)
 
         self.routine.start = start
@@ -477,6 +478,50 @@ class RoutineTestCase(WgerTestCase):
                     date=datetime.date(2024, 1, 12),
                 ),
             ],
+        )
+
+    def test_date_sequence_fit_in_week_need_logs_no_session(self):
+        """
+        Test that fit_in_week doesn't insert rest day placeholders while the
+        first day is still waiting for logs
+        """
+
+        # Arrange
+        today = timezone.localdate()
+        start = today - datetime.timedelta(days=10)
+
+        self.routine.fit_in_week = True
+        self.routine.start = start
+        self.routine.end = today + datetime.timedelta(weeks=2)
+        self.routine.save()
+        self.day1.need_logs_to_advance = True
+        self.day1.save()
+
+        Label.objects.all().delete()
+        WorkoutSession.objects.all().delete()
+
+        # Assert
+        sequence = self.routine.date_sequence
+
+        # The first day stays current up to today, one entry per date
+        for i in range((today - start).days + 1):
+            self.assertEqual(
+                sequence[i],
+                WorkoutDayData(
+                    day=self.day1,
+                    iteration=1,
+                    date=start + datetime.timedelta(days=i),
+                ),
+            )
+
+        # For dates in the future, the days advance
+        self.assertEqual(
+            sequence[(today - start).days + 1],
+            WorkoutDayData(
+                day=self.day2,
+                iteration=1,
+                date=today + datetime.timedelta(days=1),
+            ),
         )
 
     def test_date_sequences_current(self):

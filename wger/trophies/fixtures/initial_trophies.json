@@ -132,7 +132,7 @@
       "uuid": "b605b6a1-953d-41fb-87c9-a2f88b5f5907",
       "name": "Unstoppable",
       "description": "Maintain a 30-day workout streak",
-      "trophy_type": "sequence",
+      "trophy_type": "streak",
       "checker_class": "streak",
       "checker_params": {"days": 30},
       "is_hidden": false,

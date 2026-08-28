@@ -30,6 +30,7 @@ class Trophy(models.Model):
     TYPE_VOLUME = 'volume'
     TYPE_COUNT = 'count'
     TYPE_SEQUENCE = 'sequence'
+    TYPE_STREAK = 'streak'
     TYPE_DATE = 'date'
     TYPE_PR = 'pr'
     TYPE_OTHER = 'other'
@@ -39,6 +40,7 @@ class Trophy(models.Model):
         (TYPE_VOLUME, 'Volume-based'),
         (TYPE_COUNT, 'Count-based'),
         (TYPE_SEQUENCE, 'Sequence-based'),
+        (TYPE_STREAK, 'Streak-based'),
         (TYPE_DATE, 'Date-based'),
         (TYPE_PR, 'Personal Record'),
         (TYPE_OTHER, 'Other'),
@@ -73,7 +75,7 @@ class Trophy(models.Model):
         verbose_name='Trophy type',
         help_text='The type of criteria used to evaluate this trophy',
     )
-    """The type of trophy (time, volume, count, sequence, date, other)"""
+    """The type of trophy (time, volume, count, sequence, streak, date, other)"""
 
     checker_class = models.CharField(
         max_length=255,

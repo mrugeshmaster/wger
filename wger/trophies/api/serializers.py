@@ -130,6 +130,15 @@ class UserStatisticsSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class TrophySummarySerializer(serializers.Serializer):
+    """
+    How many trophies the user has earned, out of the ones they can see
+    """
+
+    earned = serializers.IntegerField()
+    total = serializers.IntegerField()
+
+
 class TrophyProgressSerializer(serializers.Serializer):
     """
     Serializer for trophy progress information.

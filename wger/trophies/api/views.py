@@ -31,6 +31,7 @@ from wger.trophies.api.filtersets import (
 from wger.trophies.api.serializers import (
     TrophyProgressSerializer,
     TrophySerializer,
+    TrophySummarySerializer,
     UserStatisticsSerializer,
     UserTrophySerializer,
 )
@@ -86,6 +87,32 @@ class TrophyViewSet(viewsets.ReadOnlyModelViewSet):
 
         # Anonymous users only see non-hidden trophies
         return queryset.filter(is_hidden=False)
+
+    @extend_schema(
+        summary='Get the trophy counts for the current user',
+        description=(
+            'Return how many trophies the user has earned and how many they can see.\n\n'
+            'Both numbers come from the same queryset the list endpoint uses, so a hidden '
+            'trophy the user has not earned counts towards neither. An anonymous user gets '
+            'zero earned and the number of trophies that are not hidden.'
+        ),
+        responses={200: TrophySummarySerializer},
+    )
+    @action(detail=False, methods=['get'], pagination_class=None)
+    def summary(self, request):
+        """
+        Return the earned and visible trophy counts for the current user
+        """
+        visible = self.filter_queryset(self.get_queryset())
+
+        earned = 0
+        if request.user.is_authenticated:
+            earned = UserTrophy.objects.filter(
+                user=request.user,
+                trophy__in=visible,
+            ).values('trophy_id').distinct().count()
+
+        return Response(TrophySummarySerializer({'earned': earned, 'total': visible.count()}).data)
 
     @extend_schema(
         summary='Get trophy progress',

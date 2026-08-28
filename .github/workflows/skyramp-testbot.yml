@@ -65,18 +65,12 @@ jobs:
           token: ${{ steps.skyramp-testbot-app-token.outputs.token }}
           persist-credentials: false
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-
       - name: Build wger server image
-        uses: docker/build-push-action@v7
-        with:
-          context: wger
-          file: wger/extras/docker/production/Dockerfile
-          tags: wger/server:testbot
-          load: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+        run: |
+          podman build \
+            -f wger/extras/docker/production/Dockerfile \
+            -t wger/server:testbot \
+            wger
 
       - uses: skyramp/testbot@3d8f06f7223f2a7c187e4f3f3ed2b2e074770e8e # v0.11.10
         with:

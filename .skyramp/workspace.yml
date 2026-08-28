@@ -4,20 +4,20 @@ workspace:
   repoUrl: https://github.com/mrugeshmaster/wger
 metadata:
   schemaVersion: v1
-  executorVersion: v1.3.29
-  createdAt: "2026-06-25T19:06:51.168Z"
-  updatedAt: "2026-06-25T19:08:42.838Z"
+  executorVersion: v1.3.40
+  createdAt: "2026-08-28T04:32:10.716Z"
+  updatedAt: "2026-08-28T04:32:10.717Z"
 services:
   - serviceName: wger-backend
     language: python
     framework: pytest
     testDirectory: tests/skyramp
     api:
-      schemaPath: http://localhost/api/v2/schema
+      schemaPath: http://localhost:8000/api/v2/schema
       authType: token
       authHeader: Authorization
       authScheme: Token
-      baseUrl: http://localhost
+      baseUrl: http://localhost:8000
     runtimeDetails:
       serverStartCommand: docker compose -f .skyramp/sut/docker-compose.testbot.yml up -d web
       runtime: docker
@@ -30,7 +30,7 @@ services:
     api:
       authType: none
       authHeader: ""
-      baseUrl: http://localhost
+      baseUrl: http://localhost:8000
     runtimeDetails:
       serverStartCommand: docker compose -f .skyramp/sut/docker-compose.testbot.yml up -d web
       runtime: docker

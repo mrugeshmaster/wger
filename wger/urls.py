@@ -208,7 +208,7 @@ router.register(
 # Nutrition app
 router.register(r'ingredient', nutrition_api_views.IngredientViewSet, basename='api-ingredient')
 router.register(
-    r'ingredientinfo', nutrition_api_views.IngredientInfoViewSet, basename='api-ingredientinfo'
+    r'ingredient-info', nutrition_api_views.IngredientInfoViewSet, basename='api-ingredient-info'
 )
 router.register(
     r'ingredient-sync',
@@ -325,6 +325,20 @@ urlpatterns += [
         'api/v2/userprofile/verify-email/',
         core_api_views.VerifyEmailView.as_view(),
         name='userprofile-verify-email',
+    ),
+    # Retired 2026-08: ingredientinfo was renamed to ingredient-info to match the
+    # other hyphenated ingredient routes. The old paths answer 410 Gone rather
+    # than 404 so a client hitting the removed name learns it was retired, not
+    # mistyped. Must precede the router include.
+    path(
+        'api/v2/ingredientinfo/',
+        nutrition_api_views.ingredientinfo_gone,
+        name='ingredientinfo-gone',
+    ),
+    path(
+        'api/v2/ingredientinfo/<path:rest>',
+        nutrition_api_views.ingredientinfo_gone,
+        name='ingredientinfo-gone-detail',
     ),
     path('api/v2/', include(router.urls)),
     path('api/v2/token/refresh', TokenRefreshView.as_view(), name='token_refresh'),

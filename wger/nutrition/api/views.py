@@ -31,8 +31,16 @@ from drf_spectacular.utils import (
     OpenApiParameter,
     extend_schema,
 )
-from rest_framework import viewsets
-from rest_framework.decorators import action
+from rest_framework import (
+    status,
+    viewsets,
+)
+from rest_framework.decorators import (
+    action,
+    api_view,
+    permission_classes,
+)
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 # wger
@@ -481,3 +489,17 @@ class LogItemViewSet(WgerOwnerObjectModelViewSet):
         """
         serializer = NutritionalValuesSerializer(self.get_object().get_nutritional_values())
         return Response(serializer.data)
+
+
+@extend_schema(exclude=True)
+@api_view(['GET', 'HEAD', 'OPTIONS'])
+@permission_classes([AllowAny])
+def ingredientinfo_gone(request, rest=None):
+    """
+    The ingredientinfo endpoint was renamed to ingredient-info. Answer 410 Gone
+    so a client on the old name learns it was retired rather than mistyped.
+    """
+    return Response(
+        {'detail': 'This endpoint was renamed to ingredient-info.'},
+        status=status.HTTP_410_GONE,
+    )

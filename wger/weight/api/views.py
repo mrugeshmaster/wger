@@ -24,6 +24,11 @@ from django.db.models import (
 )
 
 # Third Party
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    extend_schema,
+)
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -61,13 +66,35 @@ class WeightEntryViewSet(viewsets.ModelViewSet):
         """
         serializer.save(user=self.request.user)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'user',
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description=(
+                    'ID of the user whose summary to return. Used by the gym trainer '
+                    'view. Defaults to the logged in user.'
+                ),
+            ),
+        ],
+    )
     @action(detail=False, methods=['get'])
     def summary(self, request):
         """
-        Returns aggregate statistics for the authenticated user's weight entries:
+        Returns aggregate statistics for a user's weight entries:
         count, min_weight, max_weight, avg_weight.
+
+        Trainers open this for the members they manage, so the user can be given
+        explicitly with ?user=. Without it the logged in user's own entries are
+        summarised.
         """
-        qs = self.get_queryset()
+        user_id = request.query_params.get('user')
+        if user_id:
+            qs = WeightEntry.objects.filter(user_id=user_id)
+        else:
+            qs = self.get_queryset()
+
         stats = qs.aggregate(
             count=Count('id'),
             min_weight=Min('weight'),
